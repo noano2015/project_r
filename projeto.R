@@ -11,20 +11,12 @@ sqrt_ph <- sqrt(wein$pH)
 # Obtaining the values of the quality
 quality <- wein$quality
 
-Q1 <- quantile(wein$pH, 0.25)
-Q3 <- quantile(wein$pH, 0.75)
-IQR <- Q3 - Q1
-lower <- Q1 - 1.5*IQR
-upper <- Q3 + 1.5*IQR
-
-outliers <- wein[wein$pH < lower | wein$pH > upper ,]
-outliers_sqrt_ph <- sqrt(outliers$pH)
-outliers_quality <- outliers$quality
 # Creating the plot
 p <- ggplot(wein, aes(x = factor(quality), y = sqrt_ph)) +
-        geom_boxplot(outlier.shape = NA, fill = "lightblue", color = "darkblue") +
-        geom_jitter(data = outliers, aes(x = factor(outliers_quality), y = outliers_sqrt_ph),
-                    width = 0.2, height = 0, alpha = 1 , color = 'red', size = 1) +
+        geom_boxplot(outlier.shape = 19, outlier.colour = 'red',
+                     outlier.stroke = 0.5,
+                     outlier.size = 2, staplewidth = 0.5,
+                     fill = "lightblue", color = "darkblue") +
   labs(
     title = "Influence of the sqrt ph into quality",
     x = "Wine Quality (1 = poor, 5 = excellent)",
@@ -211,7 +203,7 @@ LOG_SUM_DIV_N <-   log(SUM/N)
 DIV_OF_SUM_LOG_BY_N= LOG_SUM/N
 
 verossimilhanca <- function(alpha){
-  log(alpha) - digamma(alpha) - LOG_SUM_DIV_N + DIV_OF_SUM_LOG_BY_N
+  return(log(alpha) - digamma(alpha) - LOG_SUM_DIV_N + DIV_OF_SUM_LOG_BY_N)
 }
 
 alpha_hat <- uniroot(verossimilhanca, c(64.5,77.5))$root
@@ -252,12 +244,70 @@ result <- round(prop / gama, digits = 4)
 
 print(result)
 
-  
-
-  
 
 
+# Exercício 9
 
+
+set.seed(4032)
+m <- 900
+n <- 12
+
+amostra <- matrix(rnorm(m*n, Ex, sigma), nrow = m, ncol = n)
+
+
+
+# Exercício 10
+
+
+dados_velocidade <- c(4, 6.8, 5.6, 6.9, 5.6, 7.5, 4.5, 1.6, 7.1, 4.5, 1.7,
+                      8.7, 4.3, 2.8, 0.9, 3.2, 0.8, 7.7, 1.9, 3.5, 0.4, 5.9,
+                      9.6, 4.5, 0.7, 2.5, 3.6, 7.2, 3.9, 10.1, 8.2, 3.9, 7.1,
+                      3.3, 4.2, 2, 1.8, 7.2, 1.4, 8.4, 5.8, 4.7, 2.4, 3.7, 3.4,
+                      4.2, 3.5, 6.6, 3.3, 5, 4.7, 6.2, 2.9, 0.6, 4.6, 6.2, 4.4,
+                      3.1, 4, 1.6, 5.1, 8.1, 4.9, 2.7, 5.3, 4.3, 3.1, 7.6, 11.1,
+                      6.8, 2.7, 7.1, 1.8, 3.3, 3.9, 2.9, 6.3, 4.1, 6.5, 1.7,
+                      6.6, 5.2, 4.8, 5.6, 4.4, 1.3, 1.6, 5.3, 5.4, 4.9, 3.5,
+                      4.2, 2.1, 5.3, 3.7, 3.3, 3.8, 2.2, 4.3, 5.2, 5.4, 2.7,
+                      4.6, 2.3, 0.8, 3.7, 7.4, 4.2, 4.9, 4.7, 3.8, 6.6, 4.5,
+                      2.4, 4.9, 4.1, 1.7, 6.6, 4, 5.7, 4.8, 5.8, 2.1, 3, 4.6,
+                      3.3, 2.1, 7.5, 2.6, 3.2, 9.3, 6.2, 2.6, 5.8, 8.2, 1.5, 
+                      2.6, 5.3, 8.4, 7.8, 2.7, 3.1, 5.9, 6, 5.3, 3.9, 2.9, 5.1,
+                      8, 6.5, 4.4, 2, 4.2, 4.5, 2.3, 4.9, 7.1, 7.3, 2.6, 3.1,
+                      2.9, 1.4, 5.1, 6.2, 4.6, 4, 3.7, 2.4, 7.9, 3.7, 2.4, 
+                      0.7, 9.1, 8, 1, 9.6, 5.2, 6.8, 3.8, 3, 5.3, 1.9, 2.8,
+                      6.4, 2.6, 3, 3.1, 1.6, 3.4, 6.7, 4, 6.1, 5, 7.4, 5.4,
+                      3.7, 3.2, 3.7, 5.5, 2.1, 2.3, 5.8, 4.9, 1.1, 7.5, 3.9,
+                      2.5, 3.3, 1.3, 7.1, 4.7, 3.1, 6.3, 4.4, 3.4, 3.7, 4.1,
+                      4.1, 2.7, 3.5, 5.3, 4.5, 3.5, 1.3, 1.5, 4, 4.8, 3, 3.7,
+                      1.2, 3, 3, 2.4, 2.2, 5.8, 5.9, 6.5, 2.3, 3.4, 1.1, 5.5,
+                      4.6, 2.8, 6, 6.7, 3.5, 2.9, 3.9, 8.2, 5.5, 4.4, 4.5, 
+                      8.2, 1.3, 12.4, 4.8, 1.3, 6.6, 5, 1.4, 8.6, 5.7, 1.6,
+                      5, 1.7, 4, 9.6, 3.7, 1.5, 7.1)
+
+set.seed(2851)
+n <- 242
+amostra_velocidade <- sample(dados_velocidade, n, replace = FALSE)
+sigma <- 3.9
+k <- 8
+
+prob <- seq(0, 1, length.out = k + 1)
+
+inv_dist_Rayleight <- function(p, sigma){
+  return(sqrt(-2*sigma^2 *log(1-p)))
+}
+
+
+limites <- inv_dist_Rayleight(prob, sigma)
+
+freq_observadas <- hist(amostra_velocidade, breaks = limites, plot = FALSE)$count
+
+esperadas <- rep(length(amostra_velocidade) / k, k)
+
+resultado <- chisq.test(x = freq_observadas, p = rep(1/k, k))
+
+cat(resultado$statistic)
+cat(resultado$p.value)
 
 
 
