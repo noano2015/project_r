@@ -248,12 +248,45 @@ print(result)
 
 # Exercício 9
 
+# Amostras aleatórias de uma distribuição exponencial
 
 set.seed(4032)
 m <- 900
 n <- 12
 
-amostra <- matrix(rnorm(m*n, Ex, sigma), nrow = m, ncol = n)
+# H0
+mu0 <- 5
+
+#H1
+mu1 <- 5.8
+
+alpha <- 0.1
+
+# Obtenção do valor da estimativa de teste
+amostra_exp <- matrix(rexp(m*n, rate = 1/mu1), nrow = m, ncol = n)
+amostra_exp <- rowMeans(amostra_exp)
+T_obs <- (2* n* amostra_exp)/ mu0
+
+# valor crítico
+critico <- qchisq(1 - alpha, 2*n)
+
+# Erro tipo 2 experimental
+beta_prev <- mean(T_obs <= critico)
+
+# Erro tipo 2 esperado
+
+beta <- critico * mu0/mu1
+beta <- pchisq(beta, 2*n)
+
+# resultado
+
+razao <- beta_prev/beta
+
+print(round(razao, 4))
+
+
+
+
 
 
 
@@ -298,12 +331,16 @@ inv_dist_Rayleight <- function(p, sigma){
 }
 
 
+# Obter os limites para os intervalos
 limites <- inv_dist_Rayleight(prob, sigma)
 
+# distribuir os valroes observados nos respetivos intervalos
 freq_observadas <- hist(amostra_velocidade, breaks = limites, plot = FALSE)$count
 
+# O que seria esperado caso fossem todos equiprováveis
 esperadas <- rep(length(amostra_velocidade) / k, k)
 
+# Obtenção do valor do teste e do valor p
 resultado <- chisq.test(x = freq_observadas, p = rep(1/k, k))
 
 cat(resultado$statistic)
